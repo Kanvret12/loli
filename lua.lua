@@ -1048,7 +1048,7 @@ local function farm()
         Chair = runtimeItems:FindFirstChild("Chair")
         if not Chair then
             than.ThanPrint("Chair not found, retrying in 2s...")
-            task.wait(0.1)
+            task.wait(0.3)
         end
     until Chair
 
@@ -1057,7 +1057,7 @@ local function farm()
     if not seat then
         than.ThanPrint("No seat found in the chair!")
         task.wait(1)
-        return farm() -- ulangi
+        return farm()
     end
 
     sitOnChair(seat)
@@ -1333,7 +1333,6 @@ local function autoExecute()
             return
         end
         
-        -- Features to preserve across teleports
         local execFeature = {
             auto_bond = (getgenv().__var and getgenv().__var.v_bond) or false
         }
@@ -1342,7 +1341,7 @@ local function autoExecute()
         local enabledfitur = ""
         for name, isEnabled in pairs(execFeature) do
             if isEnabled then
-                enabledfitur = enabledfitur .. string.format("getgenv().%s = %s;\n", name, tostring(isEnabled))
+                enabledfitur = enabledfitur .. ("%s=true;\n"):format(name)
             end
         end
         
@@ -1350,11 +1349,8 @@ local function autoExecute()
         local script_key = getgenv().script_key and tostring(getgenv().script_key) or nil
         local script_url = "https://raw.githubusercontent.com/ThanHub-GG/DeadRail/refs/heads/main/free"
         local script_prem = "https://raw.githubusercontent.com/Kanvret12/loli/refs/heads/main/lua.lua"
-        
-        -- Determine which script to use
-        local useScript = script_prem -- Always using premium script in your code
-        
-        -- Build the full script string with enabled features
+    
+        local useScript = script_prem
         local fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, useScript)
         
         -- Queue the script to run after teleport
