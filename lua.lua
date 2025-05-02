@@ -1348,8 +1348,10 @@ local function autoExecute()
         }
         local enabledfitur = ""
 		for name, isEnabled in pairs(execFeature) do
-			enabledfitur = enabledfitur .. string.format('getgenv().%s = %s;\n', name, tostring(isEnabled))
-		end
+            if isEnabled then
+				enabledfitur = enabledfitur .. string.format("getgenv().%s = %s;\n", name, tostring(isEnabled))
+            end
+        end
         local script_key = script_key and tostring(script_key) or nil
         local script_url = "https://raw.githubusercontent.com/ThanHub-GG/DeadRail/refs/heads/main/free"
         local script_prem = "https://raw.githubusercontent.com/Kanvret12/loli/refs/heads/main/lua.lua"
@@ -1357,7 +1359,7 @@ local function autoExecute()
         if script_key then
 			fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, script_prem)
 		else
-			fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, script_prem)		
+			fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, script_prem)
 		end
         queueonteleport(fullScript)
     end)
