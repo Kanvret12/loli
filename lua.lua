@@ -930,6 +930,7 @@ function sitOnChair(seat)
         local weld = Instance.new("WeldConstraint")
         weld.Part0 = rootPart
         weld.Part1 = seat
+        weld.Parent = rootPart
         seat:Sit(humanoid)
         task.wait(0.1)
         humanoid:ChangeState(Enum.HumanoidStateType.Seated)
@@ -1336,7 +1337,6 @@ end
 
 local function autoExecute()
     if disable_auto_execute then return end
-
     local success, err = pcall(function()
         local queueonteleport = queueonteleport or queue_on_teleport or (syn and syn.queue_on_teleport) or (fluxus and fluxus.queue_on_teleport)
         if not queueonteleport then
@@ -1366,11 +1366,23 @@ local function autoExecute()
 end
 
 
-local humanoid = character:WaitForChild("Humanoid")
-humanoid.Died:Connect(function()
-    autoExecute()
+local function setupCharacter(character)
+    local humanoid = character:WaitForChild("Humanoid", 5)
+    if humanoid then
+        humanoid.Died:Connect(function()
+            autoExecute()
+        end)
+    end
+end
+
+LocalPlayer.CharacterAdded:Connect(function(character)
+    setupCharacter(character)
 end)
 
 LocalPlayer.CharacterRemoving:Connect(function()
     autoExecute()
 end)
+
+if LocalPlayer.Character then
+    setupCharacter(LocalPlayer.Character)
+end
