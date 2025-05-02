@@ -919,26 +919,86 @@ end
 local Chair
 
 function sitOnChair(seat)
-    if humanoid and rootPart then
-        task.wait(0.1)
-        rootPart.CFrame = seat.CFrame * CFrame.new(0, 2.2, 0)
-        humanoid.PlatformStand = true
-        humanoid.AutoRotate = false
-        rootPart.Velocity = Vector3.zero
-        rootPart.RotVelocity = Vector3.zero
-        local weld = Instance.new("WeldConstraint")
-        weld.Part0 = rootPart
-        weld.Part1 = seat
-        weld.Parent = rootPart
-        seat:Sit(humanoid)
-        task.wait(0.1)
-        humanoid:ChangeState(Enum.HumanoidStateType.Seated)
-        humanoid.StateChanged:Connect(function(oldState, newState)
-            if newState == Enum.HumanoidStateType.Freefall or newState == Enum.HumanoidStateType.GettingUp then
-                weld:Destroy()
+    if not humanoid or not rootPart then return end
+    
+    local originalCFrame = rootPart.CFrame
+    local originalPlatformStand = humanoid.PlatformStand
+    local originalAutoRotate = humanoid.AutoRotate
+    
+    task.wait(0.1)
+    rootPart.CFrame = seat.CFrame * CFrame.new(0, 2.2, 0) * CFrame.Angles(0, math.rad(180), 0)
+    humanoid.PlatformStand = true
+    humanoid.AutoRotate = false
+    rootPart.Velocity = Vector3.zero
+    rootPart.RotVelocity = Vector3.zero
+    local weld = Instance.new("WeldConstraint")
+    weld.Part0 = rootPart
+    weld.Part1 = seat
+    weld.Parent = rootPart
+    local bodyPosition = Instance.new("BodyPosition")
+    bodyPosition.Position = seat.Position + Vector3.new(0, 3, 0)
+    bodyPosition.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    bodyPosition.D = 100
+    bodyPosition.P = 10000
+    bodyPosition.Parent = rootPart
+    local bodyGyro = Instance.new("BodyGyro")
+    bodyGyro.CFrame = seat.CFrame * CFrame.Angles(math.rad(0), math.rad(180), math.rad(0))
+    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+    bodyGyro.D = 100
+    bodyGyro.P = 10000
+    bodyGyro.Parent = rootPart
+    seat:Sit(humanoid)
+    task.wait(0.1)
+    humanoid:ChangeState(Enum.HumanoidStateType.Seated)
+    coroutine.wrap(function()
+        local startTime = tick()
+        while weld.Parent and (tick() - startTime) < 60 do  
+            if math.random() < 0.05 then 
+                rootPart.CFrame = seat.CFrame * CFrame.new(
+                    math.random(-0.5, 0.5),
+                    2.2 + math.random(-0.1, 0.1),
+                    math.random(-0.5, 0.5)
+                ) * CFrame.Angles(
+                    math.rad(math.random(-5, 5)),
+                    math.rad(math.random(-5, 5)),
+                    math.rad(math.random(-5, 5))
+                )
+                task.wait(0.05)
             end
-        end)
-    end
+            task.wait()
+        end
+    end)()
+    local stateChanged = humanoid.StateChanged:Connect(function(oldState, newState)
+        if newState == Enum.HumanoidStateType.Freefall or 
+           newState == Enum.HumanoidStateType.GettingUp or
+           newState == Enum.HumanoidStateType.Running or
+           newState == Enum.HumanoidStateType.Jumping then
+            -- Bersihkan semua
+            if weld and weld.Parent then weld:Destroy() end
+            if bodyPosition and bodyPosition.Parent then bodyPosition:Destroy() end
+            if bodyGyro and bodyGyro.Parent then bodyGyro:Destroy() end
+            
+            -- Reset state
+            humanoid.PlatformStand = originalPlatformStand
+            humanoid.AutoRotate = originalAutoRotate
+            
+            stateChanged:Disconnect()
+        end
+    end)
+    task.delay(60, function()
+        if weld and weld.Parent then
+            weld:Destroy()
+        end
+        if bodyPosition and bodyPosition.Parent then
+            bodyPosition:Destroy()
+        end
+        if bodyGyro and bodyGyro.Parent then
+            bodyGyro:Destroy()
+        end
+        if connection then
+            connection:Disconnect()
+        end
+    end)
 end
 
 local function incrementBondCount()
@@ -1136,8 +1196,8 @@ Tabs["Main"]:Paragraph({
 Tabs["Main"]:Toggle(than.Toggle("Auto Bond", "Automatically Collect Bond", __var.v_bond, function(state)
     __var.v_bond = state
     if state then
-        farm()
         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("EndDecision"):FireServer(false)
+        farm()
     else
         than.ThanPrint("Auto bond mati")
     end
