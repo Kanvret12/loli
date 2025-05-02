@@ -1356,6 +1356,8 @@ local function autoExecute()
         local fullScript
         if script_key then
 			fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, script_prem)
+		else
+			fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, script_prem)		
 		end
         queueonteleport(fullScript)
     end)
