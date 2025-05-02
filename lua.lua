@@ -950,55 +950,6 @@ function sitOnChair(seat)
     seat:Sit(humanoid)
     task.wait(0.1)
     humanoid:ChangeState(Enum.HumanoidStateType.Seated)
-    coroutine.wrap(function()
-        local startTime = tick()
-        while weld.Parent and (tick() - startTime) < 60 do  
-            if math.random() < 0.05 then 
-                rootPart.CFrame = seat.CFrame * CFrame.new(
-                    math.random(-0.5, 0.5),
-                    2.2 + math.random(-0.1, 0.1),
-                    math.random(-0.5, 0.5)
-                ) * CFrame.Angles(
-                    math.rad(math.random(-5, 5)),
-                    math.rad(math.random(-5, 5)),
-                    math.rad(math.random(-5, 5))
-                )
-                task.wait(0.05)
-            end
-            task.wait()
-        end
-    end)()
-    local stateChanged = humanoid.StateChanged:Connect(function(oldState, newState)
-        if newState == Enum.HumanoidStateType.Freefall or 
-           newState == Enum.HumanoidStateType.GettingUp or
-           newState == Enum.HumanoidStateType.Running or
-           newState == Enum.HumanoidStateType.Jumping then
-            -- Bersihkan semua
-            if weld and weld.Parent then weld:Destroy() end
-            if bodyPosition and bodyPosition.Parent then bodyPosition:Destroy() end
-            if bodyGyro and bodyGyro.Parent then bodyGyro:Destroy() end
-            
-            -- Reset state
-            humanoid.PlatformStand = originalPlatformStand
-            humanoid.AutoRotate = originalAutoRotate
-            
-            stateChanged:Disconnect()
-        end
-    end)
-    task.delay(60, function()
-        if weld and weld.Parent then
-            weld:Destroy()
-        end
-        if bodyPosition and bodyPosition.Parent then
-            bodyPosition:Destroy()
-        end
-        if bodyGyro and bodyGyro.Parent then
-            bodyGyro:Destroy()
-        end
-        if connection then
-            connection:Disconnect()
-        end
-    end)
 end
 
 local function incrementBondCount()
