@@ -1102,9 +1102,6 @@ local function farm()
             end
 
             if #chairs > 0 then
-                humanoid.Jump = true
-                task.wait(1)
-                humanoid.Jump = false
                 humanoid.PlatformStand = true
                 local newSeat = chairs[1]
                 than.ThanPrint("Trying chair 1 of", #chairs)
@@ -1335,58 +1332,82 @@ if (__var.v_bond) then
     end
 end
 
+-- Fix for auto execute not working
 local function autoExecute()
     if disable_auto_execute then return end
+    
     local success, err = pcall(function()
-        local queueonteleport = queueonteleport or queue_on_teleport or (syn and syn.queue_on_teleport) or (fluxus and fluxus.queue_on_teleport)
+        local queueonteleport = queueonteleport or queue_on_teleport or 
+                               (syn and syn.queue_on_teleport) or 
+                               (fluxus and fluxus.queue_on_teleport)
+        
         if not queueonteleport then
-            warn("Executor tidak mendukung queue_on_teleport.")
+            warn("Executor does not support queue_on_teleport.")
             return
         end
+        
+        -- Features to preserve across teleports
         local execFeature = {
-            auto_bond = (__var.v_bond)
+            auto_bond = (getgenv().__var and getgenv().__var.v_bond) or false
         }
+        
+        -- Build enabled features string
         local enabledfitur = ""
-		for name, isEnabled in pairs(execFeature) do
+        for name, isEnabled in pairs(execFeature) do
             if isEnabled then
-				enabledfitur = enabledfitur .. string.format("getgenv().%s = %s;\n", name, tostring(isEnabled))
+                enabledfitur = enabledfitur .. string.format("getgenv().%s = %s;\n", name, tostring(isEnabled))
             end
         end
-        local script_key = script_key and tostring(script_key) or nil
+        
+        -- Script configuration
+        local script_key = getgenv().script_key and tostring(getgenv().script_key) or nil
         local script_url = "https://raw.githubusercontent.com/ThanHub-GG/DeadRail/refs/heads/main/free"
         local script_prem = "https://raw.githubusercontent.com/Kanvret12/loli/refs/heads/main/lua.lua"
-        local fullScript
-        if script_key then
-			fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, script_prem)
-		else
-			fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, script_prem)
-		end
+        
+        -- Determine which script to use
+        local useScript = script_prem -- Always using premium script in your code
+        
+        -- Build the full script string with enabled features
+        local fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, useScript)
+        
+        -- Queue the script to run after teleport
         queueonteleport(fullScript)
+        print("Auto-execute successfully queued")
     end)
-
+    
     if not success then
         warn("Auto execute error: " .. tostring(err))
     end
 end
 
+-- Set up character events
+local LocalPlayer = game:GetService("Players").LocalPlayer
 
 local function setupCharacter(character)
+    if not character then return end
     local humanoid = character:WaitForChild("Humanoid", 5)
     if humanoid then
         humanoid.Died:Connect(function()
+            print("Character died, triggering auto-execute")
             autoExecute()
         end)
     end
 end
 
-LocalPlayer.CharacterAdded:Connect(function(character)
-    setupCharacter(character)
+LocalPlayer.CharacterAdded:Connect(function()
+    print("Character added, setting up listeners")
+	autoExecute()
 end)
 
 LocalPlayer.CharacterRemoving:Connect(function()
+    print("Character removing, triggering auto-execute")
     autoExecute()
 end)
 
+-- Set up existing character if present
 if LocalPlayer.Character then
+    print("Initial character setup")
     setupCharacter(LocalPlayer.Character)
 end
+
+autoExecute()
