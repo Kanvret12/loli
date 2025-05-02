@@ -1023,7 +1023,7 @@ local function ensureChairMovement(seat)
             math.random(-10, 10)
         )
         rootPart.CFrame = targetCFrame1
-        task.wait(3)
+        task.wait(3.5)
         local newChairPos = seat.Position
         chairMoved = (newChairPos - initialChairPos).Magnitude > 0.1
         if chairMoved then
@@ -1038,16 +1038,11 @@ local function ensureChairMovement(seat)
 end
 local function farm()
     if not character then return end
-
-    local autoBondScreen = FarmScreen("Auto Bond")
-    autoBondScreen:Show()
-
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
     local targetCFrame = addNoise(teslaCFrame)
     humanoidRootPart.CFrame = targetCFrame
 
-    task.wait(0.5)
-
+    task.wait(0.8)
 
     repeat
         Chair = runtimeItems:FindFirstChild("Chair")
@@ -1062,8 +1057,7 @@ local function farm()
     if not seat then
         than.ThanPrint("No seat found in the chair!")
         task.wait(1)
-        autoBondScreen:Hide()
-        return farm()
+        return farm() -- ulangi
     end
 
     sitOnChair(seat)
@@ -1071,6 +1065,7 @@ local function farm()
 
     if humanoid.Sit then
         than.ThanPrint("Seated on chair, checking if chair can move")
+
         local currentSeat
         for _, obj in pairs(humanoid.SeatPart.Parent:GetDescendants()) do
             if obj:IsA("Seat") or obj:IsA("VehicleSeat") then
@@ -1083,14 +1078,11 @@ local function farm()
 
         if ensureChairMovement(currentSeat) then
             than.ThanPrint("Valid - Chair position changed")
-            autoBondScreen:Countdown("Teleporting to Bond", 30)
             teleportToBases()
             teleportToBases()
             teleportToBases()
         else
-            than.ThanPrint("Couldn't move chair, trying different one")
-            autoBondScreen:Countdown("Switching Chair", 10)
-
+            than.ThanPrint("Couldn't make current chair move, trying different chair")
             local chairs = {}
             for _, item in pairs(runtimeItems:GetChildren()) do
                 if item.Name == "Chair" and item ~= (currentSeat and currentSeat.Parent) then
@@ -1102,35 +1094,30 @@ local function farm()
             end
 
             if #chairs > 0 then
-                humanoid.PlatformStand = true
+                humanoid.Jump = true
+                task.wait(1)
+                humanoid.Jump = false
+                humanoid.PlatformStand = false
                 local newSeat = chairs[1]
                 than.ThanPrint("Trying chair 1 of", #chairs)
                 if humanoid.Sit and ensureChairMovement(newSeat) then
-                    than.ThanPrint("Valid - New chair moved")
-                    autoBondScreen:Countdown("Teleporting to Bond", 30)
+                    than.ThanPrint("Valid - First chair successfully moved")
                     teleportToBases()
                     teleportToBases()
                     teleportToBases()
                 else
                     than.ThanPrint("No movable chair found, retrying...")
-                    autoBondScreen:Hide()
                     return farm()
                 end
-            else
-                than.ThanPrint("No alternate chairs, retrying...")
-                autoBondScreen:Hide()
-                return farm()
             end
+            
+            
         end
     else
         than.ThanPrint("Not seated on a chair, retrying...")
-        autoBondScreen:Hide()
         return farm()
     end
-
-    autoBondScreen:Hide()
 end
-
 -- // // // Info Tab Setup // // // --
 
 Tabs["Main"]:Section({Title = "Auto Farm"})
