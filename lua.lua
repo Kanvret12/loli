@@ -919,25 +919,26 @@ end
 local Chair
 
 function sitOnChair(seat)
-    if not humanoid or not rootPart then return end
-    
-    local originalCFrame = rootPart.CFrame
-    local originalPlatformStand = humanoid.PlatformStand
-    local originalAutoRotate = humanoid.AutoRotate
-    
-    task.wait(0.1)
-    rootPart.CFrame = seat.CFrame * CFrame.new(0, 2.2, 0) * CFrame.Angles(0, math.rad(180), 0)
-    humanoid.PlatformStand = true
-    humanoid.AutoRotate = false
-    rootPart.Velocity = Vector3.zero
-    rootPart.RotVelocity = Vector3.zero
-    local weld = Instance.new("WeldConstraint")
-    weld.Part0 = rootPart
-    weld.Part1 = seat
-    weld.Parent = rootPart
-    seat:Sit(humanoid)
-    task.wait(0.1)
-    humanoid:ChangeState(Enum.HumanoidStateType.Seated)
+    if humanoid and rootPart then
+        task.wait(0.1)
+        rootPart.CFrame = seat.CFrame * CFrame.new(0, 2.2, 0)
+        humanoid.PlatformStand = true
+        humanoid.AutoRotate = false
+        rootPart.Velocity = Vector3.zero
+        rootPart.RotVelocity = Vector3.zero
+        local weld = Instance.new("WeldConstraint")
+        weld.Part0 = rootPart
+        weld.Part1 = seat
+        weld.Parent = rootPart
+        seat:Sit(humanoid)
+        task.wait(0.1)
+        humanoid:ChangeState(Enum.HumanoidStateType.Seated)
+        humanoid.StateChanged:Connect(function(oldState, newState)
+            if newState == Enum.HumanoidStateType.Freefall or newState == Enum.HumanoidStateType.GettingUp then
+                weld:Destroy()
+            end
+        end)
+    end
 end
 
 local function incrementBondCount()
