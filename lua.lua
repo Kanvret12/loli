@@ -1040,9 +1040,7 @@ local function farm()
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
     local targetCFrame = addNoise(teslaCFrame)
     humanoidRootPart.CFrame = targetCFrame
-
     task.wait(0.8)
-
     repeat
         Chair = runtimeItems:FindFirstChild("Chair")
         if not Chair then
@@ -1050,7 +1048,6 @@ local function farm()
             task.wait(0.3)
         end
     until Chair
-
     than.ThanPrint("Chair found!")
     local seat = Chair:FindFirstChildOfClass("Seat") or Chair:FindFirstChildOfClass("VehicleSeat")
     if not seat then
@@ -1096,7 +1093,7 @@ local function farm()
                 humanoid.Jump = true
                 task.wait(1)
                 humanoid.Jump = false
-                humanoid.PlatformStand = false
+                humanoid.PlatformStand = true
                 local newSeat = chairs[1]
                 than.ThanPrint("Trying chair 1 of", #chairs)
                 if humanoid.Sit and ensureChairMovement(newSeat) then
@@ -1299,7 +1296,6 @@ Tabs["Misc"]:Button({
 			end
 		})
 
--- Fix for auto execute not working
 local function autoExecute()
     if disable_auto_execute then return end
     
@@ -1309,27 +1305,18 @@ local function autoExecute()
                                (fluxus and fluxus.queue_on_teleport)
         
         if not queueonteleport then
-            warn("Executor does not support queue_on_teleport.")
+            warn("Executor tidak mendukung queue_on_teleport.")
             return
         end
-        
-        local execFeature = {
-            auto_bond = (getgenv().__var and getgenv().__var.v_bond) or false
-        }
-        local enabledfitur = ""
-        for name, isEnabled in pairs(execFeature) do
-            if isEnabled then
-                enabledfitur = enabledfitur .. ("%s=true;\n"):format(name)
-            end
-        end
-        local script_key = getgenv().script_key and tostring(getgenv().script_key) or nil
-        local script_url = "https://raw.githubusercontent.com/ThanHub-GG/DeadRail/refs/heads/main/free"
-        local script_prem = "https://raw.githubusercontent.com/Kanvret12/loli/refs/heads/main/lua.lua"
-    
-        local useScript = script_prem
-        local fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, useScript)
-        queueonteleport(fullScript)
-        print("Auto-execute successfully queued")
+        local currentAutoBond = getgenv().auto_bond
+        local scriptToExecute = string.format([[
+if getgenv().auto_bond == nil then
+    getgenv().auto_bond = %s
+end
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Kanvret12/loli/refs/heads/main/lua.lua"))()
+]], tostring(currentAutoBond or false))
+        queueonteleport(scriptToExecute)
+        print("Auto-execute berhasil disiapkan dengan auto_bond =", tostring(currentAutoBond))
     end)
     
     if not success then
@@ -1337,32 +1324,26 @@ local function autoExecute()
     end
 end
 
-local LocalPlayer = game:GetService("Players").LocalPlayer
-
 local function setupCharacter(character)
     if not character then return end
+    
     local humanoid = character:WaitForChild("Humanoid", 5)
     if humanoid then
         humanoid.Died:Connect(function()
-            print("Character died, triggering auto-execute")
+            print("Karakter mati, memicu auto-execute")
             autoExecute()
         end)
     end
 end
-
-LocalPlayer.CharacterAdded:Connect(function()
-    print("Character added, setting up listeners")
-	autoExecute()
+LocalPlayer.CharacterAdded:Connect(function(character)
+    setupCharacter(character)
 end)
 
 LocalPlayer.CharacterRemoving:Connect(function()
-    print("Character removing, triggering auto-execute")
     autoExecute()
 end)
 
--- Set up existing character if present
 if LocalPlayer.Character then
-    print("Initial character setup")
     setupCharacter(LocalPlayer.Character)
 end
 
