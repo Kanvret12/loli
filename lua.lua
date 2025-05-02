@@ -856,7 +856,7 @@ BoundCount.Text = tostring(bondCount)
 
 local farZ = math.random(38000000, 40000000)
 local targetCFrame = CFrame.new(0, 0, farZ)
-local teslaCFrame = CFrame.new(-669.371521, 3.61944914, 21985.8496, 0.973285735, 0.00526623288, -0.229536727, -0.00536597101, 0.999985576, 0.000189658953, 0.229534402, 0.00104709482, 0.97329998)
+local teslaCFrame = CFrame.new(teslaLab.WorldPivot.Position)
 local teslaCFrame1 = CFrame.new(284.7396545410156, 1.950000286102295, -9135.2431640625)
 local targetCFrame1 = CFrame.new(
     -353.424835, 2.77587342, 22068.3828,
@@ -919,26 +919,25 @@ end
 local Chair
 
 function sitOnChair(seat)
-    if humanoid and rootPart then
-        task.wait(0.1)
-        rootPart.CFrame = seat.CFrame * CFrame.new(0, 2.2, 0)
-        humanoid.PlatformStand = true
-        humanoid.AutoRotate = false
-        rootPart.Velocity = Vector3.zero
-        rootPart.RotVelocity = Vector3.zero
-        local weld = Instance.new("WeldConstraint")
-        weld.Part0 = rootPart
-        weld.Part1 = seat
-        weld.Parent = rootPart
-        seat:Sit(humanoid)
-        task.wait(0.1)
-        humanoid:ChangeState(Enum.HumanoidStateType.Seated)
-        humanoid.StateChanged:Connect(function(oldState, newState)
-            if newState == Enum.HumanoidStateType.Freefall or newState == Enum.HumanoidStateType.GettingUp then
-                weld:Destroy()
-            end
-        end)
-    end
+    if not humanoid or not rootPart then return end
+    
+    local originalCFrame = rootPart.CFrame
+    local originalPlatformStand = humanoid.PlatformStand
+    local originalAutoRotate = humanoid.AutoRotate
+    
+    task.wait(0.1)
+    rootPart.CFrame = seat.CFrame * CFrame.new(0, 2.2, 0) * CFrame.Angles(0, math.rad(180), 0)
+    humanoid.PlatformStand = true
+    humanoid.AutoRotate = false
+    rootPart.Velocity = Vector3.zero
+    rootPart.RotVelocity = Vector3.zero
+    local weld = Instance.new("WeldConstraint")
+    weld.Part0 = rootPart
+    weld.Part1 = seat
+    weld.Parent = rootPart
+    seat:Sit(humanoid)
+    task.wait(0.1)
+    humanoid:ChangeState(Enum.HumanoidStateType.Seated)
 end
 
 local function incrementBondCount()
@@ -1039,7 +1038,7 @@ local function farm()
     if not character then return end
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
     local targetCFrame = addNoise(teslaCFrame)
-    humanoidRootPart.CFrame = teslaCFrame
+    humanoidRootPart.CFrame = targetCFrame
     task.wait(0.8)
     repeat
         Chair = runtimeItems:FindFirstChild("Chair")
@@ -1061,6 +1060,7 @@ local function farm()
 
     if humanoid.Sit then
         than.ThanPrint("Seated on chair, checking if chair can move")
+
         local currentSeat
         for _, obj in pairs(humanoid.SeatPart.Parent:GetDescendants()) do
             if obj:IsA("Seat") or obj:IsA("VehicleSeat") then
@@ -1092,7 +1092,7 @@ local function farm()
                 humanoid.Jump = true
                 task.wait(1)
                 humanoid.Jump = false
-                humanoid.PlatformStand = false
+                humanoid.PlatformStand = true
                 local newSeat = chairs[1]
                 than.ThanPrint("Trying chair 1 of", #chairs)
                 if humanoid.Sit and ensureChairMovement(newSeat) then
