@@ -856,7 +856,7 @@ BoundCount.Text = tostring(bondCount)
 
 local farZ = math.random(38000000, 40000000)
 local targetCFrame = CFrame.new(0, 0, farZ)
-local teslaCFrame = CFrame.new(teslaLab.WorldPivot.Position)
+local teslaCFrame = CFrame.new(-669.371521, 3.61944914, 21985.8496, 0.973285735, 0.00526623288, -0.229536727, -0.00536597101, 0.999985576, 0.000189658953, 0.229534402, 0.00104709482, 0.97329998)
 local teslaCFrame1 = CFrame.new(284.7396545410156, 1.950000286102295, -9135.2431640625)
 local targetCFrame1 = CFrame.new(
     -353.424835, 2.77587342, 22068.3828,
@@ -1038,15 +1038,8 @@ end
 local function farm()
     if not character then return end
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-	local tweenInfo = TweenInfo.new(
-		1,
-		Enum.EasingStyle.Sine,
-		Enum.EasingDirection.Out 
-	)
-
-	local goal = { CFrame = targetCFrame }
-	local tween = TweenService:Create(humanoidRootPart, tweenInfo, goal)
-	tween:Play()
+    local targetCFrame = addNoise(teslaCFrame)
+    humanoidRootPart.CFrame = teslaCFrame
     task.wait(0.8)
     repeat
         Chair = runtimeItems:FindFirstChild("Chair")
