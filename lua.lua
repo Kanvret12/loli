@@ -3,6 +3,8 @@ local HttpService = game:GetService("HttpService")
 local request = (syn and syn.request) or (http and http.request) or request
 
 local urlExecute = "http://api.thanhub.xyz/api/key/execute"
+
+
 local success, response = pcall(function()
     return request({
         Url = urlExecute,
@@ -1296,25 +1298,6 @@ Tabs["Misc"]:Button({
 				end
 			end
 		})
-
-if (__var.v_bond) then
-    if auto_bond then
-        __var.v_bond = true
-        Fluent:Notify({
-            Title = "Auto Bond",
-            Content = "Auto Bond is enabled!",
-            Duration = 5,
-        })
-    end
-    if not game:IsLoaded() then
-        repeat task.wait() until game:IsLoaded()
-    end
-    if __var.v_bond then
-        getgenv().auto_bond = __var.v_bond
-        farm()
-        print("[ThanHub] Auto Bond Working")
-    end
-end
 
 -- Fix for auto execute not working
 local function autoExecute()
