@@ -1038,8 +1038,15 @@ end
 local function farm()
     if not character then return end
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-    local targetCFrame = addNoise(teslaCFrame)
-    humanoidRootPart.CFrame = targetCFrame
+	local tweenInfo = TweenInfo.new(
+		1,
+		Enum.EasingStyle.Sine,
+		Enum.EasingDirection.Out 
+	)
+
+	local goal = { CFrame = targetCFrame }
+	local tween = TweenService:Create(humanoidRootPart, tweenInfo, goal)
+	tween:Play()
     task.wait(0.8)
     repeat
         Chair = runtimeItems:FindFirstChild("Chair")
@@ -1061,7 +1068,6 @@ local function farm()
 
     if humanoid.Sit then
         than.ThanPrint("Seated on chair, checking if chair can move")
-
         local currentSeat
         for _, obj in pairs(humanoid.SeatPart.Parent:GetDescendants()) do
             if obj:IsA("Seat") or obj:IsA("VehicleSeat") then
