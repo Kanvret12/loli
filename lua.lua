@@ -3,9 +3,6 @@ local HttpService = game:GetService("HttpService")
 local request = (syn and syn.request) or (http and http.request) or request
 
 local urlExecute = "http://api.thanhub.xyz/api/key/execute"
-getgenv().v_bond = getgenv().v_bond or false
-
-
 local success, response = pcall(function()
     return request({
         Url = urlExecute,
@@ -1336,24 +1333,18 @@ local function autoExecute()
         local execFeature = {
             auto_bond = (getgenv().__var and getgenv().__var.v_bond) or false
         }
-        
-        -- Build enabled features string
         local enabledfitur = ""
         for name, isEnabled in pairs(execFeature) do
             if isEnabled then
                 enabledfitur = enabledfitur .. ("%s=true;\n"):format(name)
             end
         end
-        
-        -- Script configuration
         local script_key = getgenv().script_key and tostring(getgenv().script_key) or nil
         local script_url = "https://raw.githubusercontent.com/ThanHub-GG/DeadRail/refs/heads/main/free"
         local script_prem = "https://raw.githubusercontent.com/Kanvret12/loli/refs/heads/main/lua.lua"
     
         local useScript = script_prem
         local fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, useScript)
-        
-        -- Queue the script to run after teleport
         queueonteleport(fullScript)
         print("Auto-execute successfully queued")
     end)
@@ -1363,7 +1354,6 @@ local function autoExecute()
     end
 end
 
--- Set up character events
 local LocalPlayer = game:GetService("Players").LocalPlayer
 
 local function setupCharacter(character)
