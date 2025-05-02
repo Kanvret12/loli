@@ -1344,34 +1344,20 @@ local function autoExecute()
             warn("Executor tidak mendukung queue_on_teleport.")
             return
         end
-
-        -- Fitur-fitur yang diaktifkan
         local execFeature = {
             auto_bond = (__var.v_bond)
         }
-
-        -- String konfigurasi fitur
         local enabledfitur = ""
-        for name, isEnabled in pairs(execFeature) do
-            if isEnabled then
-                enabledfitur = enabledfitur .. ("%s=true;\n"):format(name)
-            end
-        end
-
-        -- Key script (jika ada)
+		for name, isEnabled in pairs(execFeature) do
+			enabledfitur = enabledfitur .. string.format('getgenv().%s = %s;\n', name, tostring(isEnabled))
+		end
         local script_key = script_key and tostring(script_key) or nil
-
-        -- URL script
         local script_url = "https://raw.githubusercontent.com/ThanHub-GG/DeadRail/refs/heads/main/free"
-        local script_prem = "https://raw.githubusercontent.com/ThanHub-GG/DeadRail/refs/heads/main/premium"
-
-        -- Script final yang akan dijalankan saat teleport
+        local script_prem = "https://raw.githubusercontent.com/Kanvret12/loli/refs/heads/main/lua.lua"
         local fullScript
         if script_key then
-            fullScript = string.format('script_key=%q;\n%sloadstring(game:HttpGet(%q))()', script_key, enabledfitur, script_prem)
-        else
-            fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, script_url)
-        end
+			fullScript = string.format('script_key=%q;\n%sloadstring(game:HttpGet(%q))()', script_key, enabledfitur, script_prem)
+		end
         queueonteleport(fullScript)
     end)
 
