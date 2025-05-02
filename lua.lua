@@ -1037,7 +1037,7 @@ end
 local function farm()
     if not character then return end
     local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-    local targetCFrame = addNoise(teslaCFrame)
+    local targetCFrame = addNoise(teslaCFrame1)
     humanoidRootPart.CFrame = targetCFrame
     task.wait(0.8)
     repeat
