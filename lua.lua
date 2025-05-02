@@ -1062,7 +1062,7 @@ local function farm()
         than.ThanPrint("No seat found in the chair!")
         task.wait(1)
         autoBondScreen:Hide()
-        return farm() -- ulangi
+        return farm()
     end
 
     sitOnChair(seat)
@@ -1104,7 +1104,7 @@ local function farm()
                 humanoid.Jump = true
                 task.wait(1)
                 humanoid.Jump = false
-                humanoid.PlatformStand = false
+                humanoid.PlatformStand = true
                 local newSeat = chairs[1]
                 than.ThanPrint("Trying chair 1 of", #chairs)
                 if humanoid.Sit and ensureChairMovement(newSeat) then
