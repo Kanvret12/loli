@@ -935,18 +935,6 @@ function sitOnChair(seat)
     weld.Part0 = rootPart
     weld.Part1 = seat
     weld.Parent = rootPart
-    local bodyPosition = Instance.new("BodyPosition")
-    bodyPosition.Position = seat.Position + Vector3.new(0, 3, 0)
-    bodyPosition.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-    bodyPosition.D = 100
-    bodyPosition.P = 10000
-    bodyPosition.Parent = rootPart
-    local bodyGyro = Instance.new("BodyGyro")
-    bodyGyro.CFrame = seat.CFrame * CFrame.Angles(math.rad(0), math.rad(180), math.rad(0))
-    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-    bodyGyro.D = 100
-    bodyGyro.P = 10000
-    bodyGyro.Parent = rootPart
     seat:Sit(humanoid)
     task.wait(0.1)
     humanoid:ChangeState(Enum.HumanoidStateType.Seated)
@@ -1104,7 +1092,7 @@ local function farm()
                 humanoid.Jump = true
                 task.wait(1)
                 humanoid.Jump = false
-                humanoid.PlatformStand = true
+                humanoid.PlatformStand = false
                 local newSeat = chairs[1]
                 than.ThanPrint("Trying chair 1 of", #chairs)
                 if humanoid.Sit and ensureChairMovement(newSeat) then
