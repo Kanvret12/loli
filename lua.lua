@@ -930,7 +930,6 @@ function sitOnChair(seat)
         local weld = Instance.new("WeldConstraint")
         weld.Part0 = rootPart
         weld.Part1 = seat
-        weld.Parent = rootPart
         seat:Sit(humanoid)
         task.wait(0.1)
         humanoid:ChangeState(Enum.HumanoidStateType.Seated)
@@ -1356,7 +1355,7 @@ local function autoExecute()
         local script_prem = "https://raw.githubusercontent.com/Kanvret12/loli/refs/heads/main/lua.lua"
         local fullScript
         if script_key then
-			fullScript = string.format('script_key=%q;\n%sloadstring(game:HttpGet(%q))()', script_key, enabledfitur, script_prem)
+			fullScript = string.format('%sloadstring(game:HttpGet(%q))()', enabledfitur, script_prem)
 		end
         queueonteleport(fullScript)
     end)
