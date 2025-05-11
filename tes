@@ -305,11 +305,9 @@ function executeScript()
 				task.wait(0.2)
 			until success
 		end
-
-		local safeText = tostring(text or 0):match("%d+")
-		local bondCount = tonumber(safeText) or getgenv().curent_bond or 0
+		local bondCount = tonumber(text) or getgenv().curent_bond or 0
 		getgenv().curent_bond = bondCount
-		local first_count = bondCount or 0
+		local first_count = bondCount
 		if game.PlaceId ~= 116495829188952 then
 			local success, err = pcall(function()
 				local timeout = 20
